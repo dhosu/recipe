@@ -70,6 +70,7 @@
                     </includes>
                     <additionalClasspathElements>
                         <additionalClasspathElement>${basedir}/target/classes</additionalClasspathElement>
+                        <useSystemClassLoader>false</useSystemClassLoader>
                     </additionalClasspathElements>
                     <parallel>none</parallel>
                 </configuration>
