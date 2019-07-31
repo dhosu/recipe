@@ -1,7 +1,6 @@
 package guru.springframework.recipe.domain;
 
 import lombok.*;
-import org.hibernate.annotations.ManyToAny;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -9,6 +8,9 @@ import java.util.Set;
 @Data
 @EqualsAndHashCode(exclude = {"recipes"})
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Category {
 
     @Id
