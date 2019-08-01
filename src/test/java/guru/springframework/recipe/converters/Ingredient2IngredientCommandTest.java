@@ -1,7 +1,6 @@
 package guru.springframework.recipe.converters;
 
 import guru.springframework.recipe.commands.IngredientCommand;
-import guru.springframework.recipe.commands.IngredientCommand2Ingredient;
 import guru.springframework.recipe.commands.UomCommand;
 import guru.springframework.recipe.domain.Ingredient;
 import guru.springframework.recipe.domain.Recipe;

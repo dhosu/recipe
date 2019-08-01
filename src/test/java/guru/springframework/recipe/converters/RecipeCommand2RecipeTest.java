@@ -1,7 +1,6 @@
 package guru.springframework.recipe.converters;
 
 import guru.springframework.recipe.commands.*;
-import guru.springframework.recipe.commands.IngredientCommand2Ingredient;
 import guru.springframework.recipe.domain.Difficulty;
 import guru.springframework.recipe.domain.Recipe;
 import org.junit.Before;
