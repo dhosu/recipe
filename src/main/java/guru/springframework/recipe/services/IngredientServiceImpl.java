@@ -1,6 +1,7 @@
 package guru.springframework.recipe.services;
 
 import guru.springframework.recipe.commands.IngredientCommand;
+import guru.springframework.recipe.commands.RecipeCommand;
 import guru.springframework.recipe.converters.Ingredient2IngredientCommand;
 import guru.springframework.recipe.converters.IngredientCommand2Ingredient;
 import guru.springframework.recipe.domain.Ingredient;
@@ -104,5 +105,33 @@ public class IngredientServiceImpl implements IngredientService {
         }
 
         return ingredientCommandConverter.convert(savedIngredientOptional.get());
+    }
+
+    @Override
+    public void deleteByIds(Long recipeId, Long id) {
+
+        Optional<Recipe> recipeOptional = recipeRepository.findById(recipeId);
+
+        if (!recipeOptional.isPresent()) {
+
+            // todo toss error if not found!
+            log.error("Recipe not found for id: " + recipeId);
+            return;
+        }
+
+        Recipe recipe = recipeOptional.get();
+        Optional<Ingredient> ingredientOptional = recipe.getIngredients().stream()
+                .filter(i -> i.getId() == id)
+                .findFirst();
+
+        if (ingredientOptional.isPresent()) {
+            ingredientOptional.get().setRecipe(null);
+            recipe.getIngredients().remove(ingredientOptional.get());
+
+            recipeRepository.save(recipe);
+        } else {
+            log.debug("Recipe id not found. Id: " + recipeId);
+        }
+
     }
 }

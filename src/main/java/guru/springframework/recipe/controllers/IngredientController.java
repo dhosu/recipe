@@ -77,7 +77,7 @@ public class IngredientController {
 
     @GetMapping
     @RequestMapping("/recipe/{recipeId}/ingredient/new")
-    public String newRecipe(@PathVariable String recipeId, Model model) {
+    public String newIngredient(@PathVariable String recipeId, Model model) {
 
         Long _recipeId = Long.valueOf(recipeId);
 
@@ -95,5 +95,17 @@ public class IngredientController {
         model.addAttribute("uomList", uomService.listAllUoms());
 
         return "recipe/ingredient/ingredientform";
+    }
+
+    @GetMapping
+    @RequestMapping("/recipe/{recipeId}/ingredient/{id}/delete")
+    public String deleteIngredient(@PathVariable String recipeId, @PathVariable String id, Model model) {
+
+        Long _recipeId = Long.valueOf(recipeId);
+        Long _id = Long.valueOf(id);
+
+        ingredientService.deleteByIds(_recipeId, _id);
+
+        return "redirect:/recipe/" + recipeId + "/ingredients";
     }
 }
