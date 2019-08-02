@@ -1,9 +1,6 @@
 package guru.springframework.recipe.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -56,8 +53,14 @@ public class Recipe {
     }
 
     public Recipe addIngredient(Ingredient ingredient) {
+
         ingredient.setRecipe(this);
+
+        if (ingredients == null)
+            ingredients = new HashSet<>();
+
         ingredients.add(ingredient);
+
         return this;
     }
 }

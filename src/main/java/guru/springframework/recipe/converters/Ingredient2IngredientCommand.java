@@ -24,8 +24,11 @@ public class Ingredient2IngredientCommand implements Converter<Ingredient, Ingre
         if (source == null)
             return null;
 
+        boolean isRecipeSet = source.getRecipe() != null;
+
         return IngredientCommand.builder()
                 .id(source.getId())
+                .recipeId(isRecipeSet ? source.getRecipe().getId() : 0)
                 .description(source.getDescription())
                 .amount(source.getAmount())
                 .uom(uomConverter.convert(source.getUom()))
