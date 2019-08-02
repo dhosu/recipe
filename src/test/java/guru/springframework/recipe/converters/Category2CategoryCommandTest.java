@@ -12,30 +12,36 @@ public class Category2CategoryCommandTest {
     public static final Long ID_VALUE = Long.valueOf(1L);
     public static final String DESCRIPTION = "description";
 
-    CategoryCommand2Category converter;
+    Category2CategoryCommand converter;
 
     @Before
     public void setUp() throws Exception {
-        converter = new CategoryCommand2Category();
+        converter = new Category2CategoryCommand();
     }
 
     @Test
     public void testNullObject() throws Exception {
-        assertNotNull(converter.convert(new CategoryCommand()));
+        assertNull(converter.convert(null));
+    }
+
+    @Test
+    public void testEmptyObject() throws Exception {
+        assertNotNull(converter.convert(new Category()));
     }
 
     @Test
     public void convert() throws Exception {
 
-        // given
-        CategoryCommand categoryCommand = CategoryCommand.builder().id(ID_VALUE).description(DESCRIPTION).build();
+        //given
+        Category category = new Category();
+        category.setId(ID_VALUE);
+        category.setDescription(DESCRIPTION);
 
-        // when
-        Category category = converter.convert(categoryCommand);
+        //when
+        CategoryCommand categoryCommand = converter.convert(category);
 
-        // then
-        assertEquals(ID_VALUE, category.getId());
-        assertEquals(DESCRIPTION, category.getDescription());
-    }
+        //then
+        assertEquals(ID_VALUE, categoryCommand.getId());
+        assertEquals(DESCRIPTION, categoryCommand.getDescription());    }
 
 }

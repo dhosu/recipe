@@ -18,7 +18,7 @@ import static org.junit.Assert.*;
 public class UnitOfMeasureRepositoryIT {
 
     @Autowired
-    UnitOfMeasureRepository unitOfMeasureRepository;
+    UomRepository unitOfMeasureRepository;
 
 
     @Before

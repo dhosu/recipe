@@ -16,6 +16,10 @@ public class Ingredient2IngredientCommand implements Converter<Ingredient, Ingre
         this.uomConverter = uomConverter;
     }
 
+    public Ingredient2IngredientCommand() {
+        uomConverter = new Uom2UomCommand();
+    }
+
     @Synchronized
     @Nullable
     @Override

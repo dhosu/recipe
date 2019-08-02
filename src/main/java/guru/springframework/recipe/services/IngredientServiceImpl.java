@@ -2,10 +2,14 @@ package guru.springframework.recipe.services;
 
 import guru.springframework.recipe.commands.IngredientCommand;
 import guru.springframework.recipe.converters.Ingredient2IngredientCommand;
+import guru.springframework.recipe.converters.IngredientCommand2Ingredient;
+import guru.springframework.recipe.domain.Ingredient;
 import guru.springframework.recipe.domain.Recipe;
 import guru.springframework.recipe.repositories.RecipeRepository;
+import guru.springframework.recipe.repositories.UomRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -14,11 +18,15 @@ import java.util.Optional;
 public class IngredientServiceImpl implements IngredientService {
 
     private RecipeRepository recipeRepository;
-    private Ingredient2IngredientCommand converter;
+    private UomRepository uomRepository;
+    private IngredientCommand2Ingredient ingredientConverter;
+    private Ingredient2IngredientCommand ingredientCommandConverter;
 
-    public IngredientServiceImpl(RecipeRepository recipeRepository, Ingredient2IngredientCommand converter) {
+    public IngredientServiceImpl(RecipeRepository recipeRepository, UomRepository uomRepository, IngredientCommand2Ingredient ingredientConverter, Ingredient2IngredientCommand ingredientCommandConverter) {
         this.recipeRepository = recipeRepository;
-        this.converter = converter;
+        this.uomRepository = uomRepository;
+        this.ingredientConverter = ingredientConverter;
+        this.ingredientCommandConverter = ingredientCommandConverter;
     }
 
     @Override
@@ -36,7 +44,7 @@ public class IngredientServiceImpl implements IngredientService {
         Optional<IngredientCommand> ingredientCommandOptional =
                 recipe.getIngredients().stream()
                     .filter(ingredient -> ingredient.getId().equals(ingredientId))
-                    .map(ingredient -> converter.convert(ingredient))
+                    .map(ingredient -> ingredientCommandConverter.convert(ingredient))
                     .findFirst();
 
         if (!ingredientCommandOptional.isPresent()) {
@@ -45,5 +53,56 @@ public class IngredientServiceImpl implements IngredientService {
         }
 
         return ingredientCommandOptional.get();
+    }
+
+    @Transactional
+    @Override
+    public IngredientCommand saveIngredientCommand(IngredientCommand command) {
+
+        Optional<Recipe> recipeOptional = recipeRepository.findById(command.getRecipeId());
+
+        if (!recipeOptional.isPresent()) {
+
+            // todo toss error if not found!
+            log.error("Recipe not found for id: " + command.getRecipeId());
+            return new IngredientCommand();
+        }
+
+        Recipe recipe = recipeOptional.get();
+
+        Optional<Ingredient> ingredientOptional = recipe.getIngredients().stream()
+                .filter(ingredient -> ingredient.getId().equals(command.getId()))
+                .findFirst();
+
+        if (ingredientOptional.isPresent()) {
+            Ingredient ingredientFound = ingredientOptional.get();
+            ingredientFound.setDescription(command.getDescription());
+            ingredientFound.setAmount(command.getAmount());
+            // todo address this
+            ingredientFound.setUom(uomRepository.findById(command.getUom().getId()).orElseThrow(() -> new RuntimeException("UOM_NOT_FOUND")));
+        } else {
+            Ingredient ingredient = ingredientConverter.convert(command);
+            ingredient.setRecipe(recipe);
+            recipe.addIngredient(ingredient);
+        }
+
+        Recipe savedRecipe = recipeRepository.save(recipe);
+
+        // to do check for fail
+
+        Optional<Ingredient> savedIngredientOptional = savedRecipe.getIngredients().stream()
+                .filter(ingredient -> ingredient.getId().equals(command.getId()))
+                .findFirst();
+
+        if (!savedIngredientOptional.isPresent()) {
+            // not totally safe but best guess
+            savedIngredientOptional = savedRecipe.getIngredients().stream()
+                    .filter(i -> i.getDescription().equals(command.getDescription()) &&
+                                i.getAmount().equals(command.getAmount()) &&
+                                i.getUom().getId().equals(command.getUom().getId()))
+                    .findFirst();
+        }
+
+        return ingredientCommandConverter.convert(savedIngredientOptional.get());
     }
 }
