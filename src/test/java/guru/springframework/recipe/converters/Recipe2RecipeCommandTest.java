@@ -26,6 +26,7 @@ public class Recipe2RecipeCommandTest {
     public static final Long INGRED_ID_1 = 3L;
     public static final Long INGRED_ID_2 = 4L;
     public static final Long NOTES_ID = 9L;
+    public static final Byte[] IMAGE = new Byte[] {1,2,3,4,5};
 
     Recipe2RecipeCommand converter;
 
@@ -74,6 +75,7 @@ public class Recipe2RecipeCommandTest {
                 .source(SOURCE)
                 .url(URL)
                 .notes(notes)
+                .image(IMAGE)
                 .categories(categories)
                 .ingredients(ingredients)
                 .build();
@@ -96,6 +98,7 @@ public class Recipe2RecipeCommandTest {
         assertEquals(NOTES_ID, command.getNotes().getId());
         assertEquals(2, command.getCategories().size());
         assertEquals(2, command.getIngredients().size());
+        assertArrayEquals(IMAGE, command.getImage());
     }
 
 }
