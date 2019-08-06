@@ -52,6 +52,9 @@ public class ImageController {
 
         RecipeCommand command = recipeService.findCommandById(Long.valueOf(id));
 
+        if (command.getImage() == null)
+            throw new RuntimeException("Image was null");
+
         Byte[] byteObjects = command.getImage();
         byte[] bytes = new byte[command.getImage().length];
         for (int i = 0; i < byteObjects.length; i++)
