@@ -39,7 +39,9 @@ public class RecipeControllerTest {
         MockitoAnnotations.initMocks(this);
 
         controller = new RecipeController(recipeService);
-        mock = MockMvcBuilders.standaloneSetup(controller).build();
+        mock = MockMvcBuilders.standaloneSetup(controller)
+                .setControllerAdvice(new ControllerExceptionHandler())
+                .build();
     }
 
     @Test
@@ -80,7 +82,8 @@ public class RecipeControllerTest {
                     post("/recipe")
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                         .param("id", "")
-                        .param("description", "some string"))
+                        .param("description", "some string")
+                        .param("directions", "some directions"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:/recipe/" + command.getId() + "/show"));
     }
@@ -124,5 +127,21 @@ public class RecipeControllerTest {
         mock.perform(get("/recipe/asdf/show"))
                 .andExpect(status().isBadRequest())
                 .andExpect(view().name("400error"));
+    }
+
+    @Test
+    public void testPostNewRecipeFormValidationFail() throws Exception {
+
+        RecipeCommand command = RecipeCommand.builder().id(2L).build();
+
+        when(recipeService.saveRecipeCommand(any())).thenReturn(command);
+
+        mock.perform(
+                post("/recipe")
+                    .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                    .param("id", ""))
+            .andExpect(status().isOk())
+            .andExpect(model().attributeExists("recipe"))
+            .andExpect(view().name("recipe/recipeform"));
     }
 }
